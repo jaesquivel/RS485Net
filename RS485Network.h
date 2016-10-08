@@ -58,7 +58,7 @@ class RS485Network
   public:
 
     // constructor
-    RS485 (ReadCallback fReadCallback,
+  RS485Network (ReadCallback fReadCallback,
            AvailableCallback fAvailableCallback,
            WriteCallback fWriteCallback,
            const byte bufferSize) :
@@ -70,7 +70,7 @@ class RS485Network
          {}
 
     // destructor - frees memory used
-    ~RS485 () { stop (); }
+    ~RS485Network () { stop (); }
 
     // allocate memory for buf_
     void begin ();
