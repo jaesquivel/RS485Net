@@ -12,11 +12,11 @@
 #include <Arduino.h>
 
 #ifndef RS485_SERIAL
-#define RS485_SERIAL Serial;
+#define RS485_SERIAL Serial
 #endif
 
 #ifndef RS485_TX_ENABLE_PIN
-#define RS485_TX_ENABLE_PIN 3;
+#define RS485_TX_ENABLE_PIN 3
 #endif
 
 #ifndef RS485_BAUD
