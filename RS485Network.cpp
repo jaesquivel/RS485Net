@@ -24,6 +24,8 @@ void RS485Network::begin() {
 	data_ = (byte *) malloc(bufferSize_);
 	reset();
 	errorCount_ = 0;
+	RS485_SERIAL.begin(RS485_BAUD);
+	pinMode(RS485_TX_ENABLE_PIN, OUTPUT);
 } // end of RS485Network::begin
 
 // get rid of the buffer
@@ -42,7 +44,9 @@ int RS485Network::Available() {
 }
 
 size_t RS485Network::Write(const byte what) {
+	digitalWrite(RS485_TX_ENABLE_PIN, HIGH);
 	return RS485_SERIAL.write(what);
+	digitalWrite(RS485_TX_ENABLE_PIN, LOW);
 }
 
 // called after an error to return to "not in a packet"
