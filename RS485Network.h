@@ -30,9 +30,6 @@ class RS485Network {
 		ETX = '\3'    // end of text
 	};  // end of enum
 
-	AvailableCallback fAvailableCallback_;
-	WriteCallback fWriteCallback_;
-
 	// where we save incoming stuff
 	byte * data_;
 
