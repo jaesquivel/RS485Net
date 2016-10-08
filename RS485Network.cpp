@@ -35,19 +35,6 @@ void RS485Network::stop() {
 	data_ = NULL;
 } // end of RS485Network::stop 
 
-int RS485Network::Read() {
-	return RS485_SERIAL.read();
-}
-
-int RS485Network::Available() {
-	return RS485_SERIAL.available();
-}
-
-size_t RS485Network::Write(const byte what) {
-	digitalWrite(RS485_TX_ENABLE_PIN, HIGH);
-	return RS485_SERIAL.write(what);
-	digitalWrite(RS485_TX_ENABLE_PIN, LOW);
-}
 
 // called after an error to return to "not in a packet"
 void RS485Network::reset() {
@@ -93,8 +80,6 @@ void RS485Network::sendComplemented(const byte what) {
 // put STX at start, ETX at end, and add CRC
 void RS485Network::sendMsg(const byte * data, const byte length) {
 	// no callback? Can't send
-	if (Write == NULL)
-		return;
 
 	Write(STX);  // STX
 	for (byte i = 0; i < length; i++)
@@ -188,3 +173,16 @@ bool RS485Network::update() {
 	return false;  // not ready yet
 } // end of RS485Network::update
 
+int RS485Network::Read() {
+	return RS485_SERIAL.read();
+}
+
+int RS485Network::Available() {
+	return RS485_SERIAL.available();
+}
+
+size_t RS485Network::Write(const byte what) {
+	digitalWrite(RS485_TX_ENABLE_PIN, HIGH);
+	return RS485_SERIAL.write(what);
+	digitalWrite(RS485_TX_ENABLE_PIN, LOW);
+}

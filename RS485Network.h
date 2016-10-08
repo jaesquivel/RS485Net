@@ -112,6 +112,13 @@ public:
 		return haveSTX_;
 	}
 
+private:
+	int Read();
+
+	int Available();
+
+	size_t Write(const byte what);
+
 };
 // end of class RS485
 
