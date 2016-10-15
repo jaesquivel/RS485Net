@@ -17,35 +17,35 @@
  
  */
 
-#include <RS485Network.h>
+#include <RS485Net.h>
 
 // allocate the requested buffer size
-void RS485Network::begin() {
+void RS485Net::begin() {
 	data_ = (byte *) malloc(bufferSize_);
 	reset();
 	errorCount_ = 0;
 	RS485_SERIAL.begin(RS485_BAUD);
 	pinMode(RS485_TX_ENABLE_PIN, OUTPUT);
-} // end of RS485Network::begin
+} // end of RS485Net::begin
 
 // get rid of the buffer
-void RS485Network::stop() {
+void RS485Net::stop() {
 	reset();
 	free(data_);
 	data_ = NULL;
-} // end of RS485Network::stop 
+} // end of RS485Net::stop
 
 
 // called after an error to return to "not in a packet"
-void RS485Network::reset() {
+void RS485Net::reset() {
 	haveSTX_ = false;
 	available_ = false;
 	inputPos_ = 0;
 	startTime_ = 0;
-} // end of RS485Network::reset
+} // end of RS485Net::reset
 
 // calculate 8-bit CRC
-byte RS485Network::crc8(const byte *addr, byte len) {
+byte RS485Net::crc8(const byte *addr, byte len) {
 	byte crc = 0;
 	while (len--) {
 		byte inbyte = *addr++;
@@ -58,35 +58,26 @@ byte RS485Network::crc8(const byte *addr, byte len) {
 		}  // end of for
 	}  // end of while
 	return crc;
-}  // end of RS485Network::crc8
+}  // end of RS485Net::crc8
 
 // send a byte complemented, repeated
 // only values sent would be (in hex): 
 //   0F, 1E, 2D, 3C, 4B, 5A, 69, 78, 87, 96, A5, B4, C3, D2, E1, F0
-void RS485Network::sendComplemented(const byte what) {
+void RS485Net::sendComplemented(const byte what) {
 	byte c;
 
 	// first nibble
 	c = what >> 4;
-	Write((c << 4) | (c ^ 0x0F));
+	write((c << 4) | (c ^ 0x0F));
 
 	// second nibble
 	c = what & 0x0F;
-	Write((c << 4) | (c ^ 0x0F));
+	write((c << 4) | (c ^ 0x0F));
 
-}  // end of RS485Network::sendComplemented
+}  // end of RS485Net::sendComplemented
 
-// send a message of "length" bytes (max 255) to other end
-// put STX at start, ETX at end, and add CRC
-void RS485Network::sendMsg(const byte * data, const byte length) {
-	// no callback? Can't send
-
-	Write(STX);  // STX
-	for (byte i = 0; i < length; i++)
-		sendComplemented(data[i]);
-	Write(ETX);  // ETX
-	sendComplemented(crc8(data, length));
-}  // end of RS485Network::sendMsg
+void RS485Net::sendFrame(const byte * data, const byte length) {
+}  // end of RS485Net::sendMsg
 
 // called periodically from main loop to process data and 
 // assemble the finished packet in 'data_'
@@ -96,13 +87,13 @@ void RS485Network::sendMsg(const byte * data, const byte length) {
 // You could implement a timeout by seeing if isPacketStarted() returns
 // true, and if too much time has passed since getPacketStartTime() time.
 
-bool RS485Network::update() {
+bool RS485Net::update() {
 	// no data? can't go ahead (eg. begin() not called)
 	if (data_ == NULL)
 		return false;
 
-	while (Available() > 0) {
-		byte inByte = Read();
+	while (available() > 0) {
+		byte inByte = read();
 
 		switch (inByte) {
 
@@ -171,17 +162,17 @@ bool RS485Network::update() {
 	}  // end of while incoming data
 
 	return false;  // not ready yet
-} // end of RS485Network::update
+} // end of RS485Net::update
 
-int RS485Network::Read() {
+int RS485Net::read() {
 	return RS485_SERIAL.read();
 }
 
-int RS485Network::Available() {
+int RS485Net::available() {
 	return RS485_SERIAL.available();
 }
 
-size_t RS485Network::Write(const byte what) {
+size_t RS485Net::write(const byte what) {
 	digitalWrite(RS485_TX_ENABLE_PIN, HIGH);
 	return RS485_SERIAL.write(what);
 	digitalWrite(RS485_TX_ENABLE_PIN, LOW);
